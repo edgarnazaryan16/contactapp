@@ -31,7 +31,7 @@
                         </div>
                         <div class="mb-3 d-flex justify-content-between align-items-center">
                             <div class="custom-control custom-checkbox">
-                                <input type="checkbox" class="custom-control-input" id="customCheck1">
+                                <input type="checkbox" class="custom-control-input" id="customCheck1" name="remember">
                                 <label class="custom-control-label text-black-50" for="customCheck1">Remember me</label>
                             </div>
                             <a href="{{ route('password.request') }}">Forget your password?</a>

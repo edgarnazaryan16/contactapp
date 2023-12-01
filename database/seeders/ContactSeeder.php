@@ -23,7 +23,8 @@ class ContactSeeder extends Seeder {
                 'email' => $faker->email(),
                 'phone' => $faker->phoneNumber(),
                 'address' => $faker->address(),
-                'company_id' => rand(1, 10),
+                'company_id' => rand(1, 10) + 30,
+                'user_id' => rand(1,2) + 10,
             ];
             $contacts[] = $contact;
         }

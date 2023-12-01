@@ -23,10 +23,11 @@ class CompanySeeder extends Seeder {
                 'address' => $faker->address(),
                 'website' => $faker->url(),
                 'email' => $faker->email(),
+                'user_id' => rand(1,2) + 10,
             ];
             $companies[] = $company;
         }
-        DB::table('companies')->truncate();
+        // DB::table('companies')->truncate();
         DB::table('companies')->insert($companies);
     }
 }

@@ -3,6 +3,7 @@
 use App\Http\Controllers\CompanyController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ContactController;
+use App\Http\Controllers\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
@@ -35,3 +36,4 @@ Route::get('/', function () {
 Route::resource('contacts', ContactController::class);
 Route::resource('companies', CompanyController::class);
 // Route::put('contacts/update/{contact}', ContactController::class, 'update');
+Route::get('dashboard', DashboardController::class)->name('dashboard');
