@@ -33,7 +33,9 @@ Route::get('/', function () {
 // });
 
 // Route::get('/contacts/show', [ContactsController::class, 'show'])->name('contacts.show');
-Route::resource('contacts', ContactController::class);
-Route::resource('companies', CompanyController::class);
 // Route::put('contacts/update/{contact}', ContactController::class, 'update');
-Route::get('dashboard', DashboardController::class)->name('dashboard');
+Route::middleware(['auth'])->group(function () {
+    Route::resource('contacts', ContactController::class);
+    Route::resource('companies', CompanyController::class);
+    Route::get('dashboard', DashboardController::class)->name('dashboard');
+});

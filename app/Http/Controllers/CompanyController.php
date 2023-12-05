@@ -15,7 +15,8 @@ class CompanyController extends Controller {
      */
     public function index()
     {
-        $companies = Company::orderBy('id', 'desc')->paginate($this->paginate);
+        $user_id = auth()->user()->id;
+        $companies = Company::where('user_id', $user_id)->orderBy('id', 'desc')->paginate($this->paginate);
         return view("companies.index", compact("companies"));
     }
 
@@ -37,11 +38,12 @@ class CompanyController extends Controller {
      */
     public function store(Request $request)
     {
+        $user_id = auth()->user()->id;
         $companyvalidation = $request->validate([
             'name' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
             'email' => 'required|email|max:255|unique:contacts,email',
         ]);
-        Company::create($request->all());
+        Company::create([...$request->all(), 'user_id' => $user_id]);
         return redirect('companies');
     }
 
@@ -78,12 +80,13 @@ class CompanyController extends Controller {
      */
     public function update(Request $request, $id)
     {
+        $user_id = auth()->user()->id;
         $companyvalidation = $request->validate([
             'name' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
             'email' => 'required|email|max:255|unique:contacts,email',
         ]);
         $company = Company::find($id);
-        $company->update($request->all());
+        $company->update([...$request->all(), 'user_id' => $user_id]);
         return redirect('contacts');
     }
 

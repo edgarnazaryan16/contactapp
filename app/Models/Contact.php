@@ -19,13 +19,15 @@ class Contact extends Model {
         'phone',
         'address',
         'company_id',
+        'user_id',
     ];
     public function company(): BelongsTo
     {
         return $this->belongsTo(Company::class);
     }
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 }

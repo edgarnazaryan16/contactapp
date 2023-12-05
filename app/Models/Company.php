@@ -17,13 +17,15 @@ class Company extends Model {
         'webiste',
         'address',
         'email',
+        'user_id',
     ];
     public function contacts(): HasMany
     {
         return $this->hasMany(Contact::class);
     }
 
-    public function user(): BelongsTo {
+    public function user(): BelongsTo
+    {
         return $this->belongsTo(User::class);
     }
 }

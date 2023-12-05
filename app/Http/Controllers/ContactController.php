@@ -16,21 +16,22 @@ class ContactController extends Controller {
      */
     public function index(Request $request)
     {
+        $user_id = auth()->user()->id;
         $company_id = $request->input('company_id');
         $searching = $request->searching;
         // dd($request->searching, $company_id);
-        $companies = Company::pluck('name', 'id');
+        $companies = Company::where('user_id', $user_id)->pluck('name', 'id');
         // $contacts = Contact::paginate(5);
         if (!$searching && !$company_id) {
-            $contacts = Contact::orderBy('id', 'desc')->paginate($this->paginate);
+            $contacts = Contact::where('user_id', $user_id)->orderBy('id', 'desc')->paginate($this->paginate);
         } else if ($searching && $company_id) {
-            $contacts = Contact::where('company_id', $company_id)->where(function ($query) use ($searching) {
+            $contacts = Contact::where('user_id', $user_id)->where('company_id', $company_id)->where(function ($query) use ($searching) {
                 return $query->orwhere('firstname', 'like', "%" . $searching . "%")->orwhere('lastname', 'like', "%" . $searching . "%")->orwhere('email', 'like', "%" . $searching . "%");
             })->orderBy('id', 'desc')->paginate($this->paginate)->withQueryString();
         } else if ($searching) {
-            $contacts = Contact::where('firstname', 'like', "%" . $searching . "%")->orwhere('lastname', 'like', "%" . $searching . "%")->orwhere('email', 'like', "%" . $searching . "%")->orderBy('id', 'desc')->paginate(5)->withQueryString();
+            $contacts = Contact::where('user_id', $user_id)->where('firstname', 'like', "%" . $searching . "%")->orwhere('lastname', 'like', "%" . $searching . "%")->orwhere('email', 'like', "%" . $searching . "%")->orderBy('id', 'desc')->paginate(5)->withQueryString();
         } else {
-            $contacts = Contact::where('company_id', $company_id)->orderBy('id', 'desc')->paginate($this->paginate)->withQueryString();
+            $contacts = Contact::where('user_id', $user_id)->where('company_id', $company_id)->orderBy('id', 'desc')->paginate($this->paginate)->withQueryString();
         }
         return view("contacts.index", compact('contacts', 'companies'));
     }
@@ -41,7 +42,8 @@ class ContactController extends Controller {
      */
     public function create()
     {
-        $companies = Company::pluck('name', 'id');
+        $user_id = auth()->user()->id;
+        $companies = Company::where('user_id', $user_id)->pluck('name', 'id');
         return view('contacts.create', compact('companies'));
     }
 
@@ -49,11 +51,11 @@ class ContactController extends Controller {
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request)
     {
-        // dd($request->all());
+        $user_id = auth()->user()->id;
         $contactvalidation = $request->validate([
             'firstname' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
             'lastname' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
@@ -62,7 +64,7 @@ class ContactController extends Controller {
             'phone' => 'required',
             'company_id' => 'required',
         ]);
-        Contact::create($request->all());
+        Contact::create([...$request->all(), 'user_id' => $user_id]);
         return redirect('contacts');
     }
 
@@ -75,7 +77,6 @@ class ContactController extends Controller {
     public function show($id)
     {
         $contact = Contact::with('company')->find($id);
-        // dd($contact);select('contacts.*', 'companies.name')->join('companies', 'company_id', '=', 'companies.id')->
         return view('contacts.show', compact('contact'));
     }
 
@@ -87,8 +88,9 @@ class ContactController extends Controller {
      */
     public function edit($id)
     {
+        $user_id = auth()->user()->id;
         $contact = Contact::find($id);
-        $companies = Company::pluck('name', 'id');
+        $companies = Company::where('user_id', $user_id)->pluck('name', 'id');
         return view('contacts.edit', compact('contact', 'companies'));
     }
 
@@ -101,6 +103,7 @@ class ContactController extends Controller {
      */
     public function update(Request $request, $id)
     {
+        $user_id = auth()->user()->id;
         $contactvalidation = $request->validate([
             'firstname' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
             'lastname' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
@@ -110,7 +113,7 @@ class ContactController extends Controller {
             'company_id' => 'required',
         ]);
         $contact = Contact::find($id);
-        $contact->update($request->all());
+        $contact->update([...$request->all(), 'user_id' => $user_id]);
         return redirect('contacts');
     }
 

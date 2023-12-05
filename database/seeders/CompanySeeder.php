@@ -23,7 +23,7 @@ class CompanySeeder extends Seeder {
                 'address' => $faker->address(),
                 'website' => $faker->url(),
                 'email' => $faker->email(),
-                'user_id' => rand(1,2) + 10,
+                'user_id' => rand(1, 3),
             ];
             $companies[] = $company;
         }

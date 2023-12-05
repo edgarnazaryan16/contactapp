@@ -2,6 +2,7 @@
 
 @include('layouts.navigation')
 <!-- content -->
+
 <main class="py-5">
     <div class="container">
         <h1 class="h5 mb-3">
