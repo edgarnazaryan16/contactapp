@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ContactRequest;
 use App\Models\Company;
 use App\Models\Contact;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redirect;
+use Illuminate\View\View;
 
 class ContactController extends Controller {
     private $paginate = 10;
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
-    public function index(Request $request)
+    public function index(Request $request): View
     {
         $user_id = auth()->user()->id;
         $company_id = $request->input('company_id');
@@ -38,9 +41,9 @@ class ContactController extends Controller {
     /**
      * Show the form for creating a new resource.
      *select('contacts.*', 'companies.name')->join('companies', 'company_id', '=', 'companies.id')->get
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
-    public function create()
+    public function create(): View
     {
         $user_id = auth()->user()->id;
         $companies = Company::where('user_id', $user_id)->pluck('name', 'id');
@@ -50,20 +53,12 @@ class ContactController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\ContactRequest $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(ContactRequest $request): RedirectResponse
     {
         $user_id = auth()->user()->id;
-        $contactvalidation = $request->validate([
-            'firstname' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
-            'lastname' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
-            'email' => 'required|email|max:255|unique:contacts,email',
-            'address' => 'required',
-            'phone' => 'required',
-            'company_id' => 'required',
-        ]);
         Contact::create([...$request->all(), 'user_id' => $user_id]);
         return redirect('contacts');
     }
@@ -72,9 +67,9 @@ class ContactController extends Controller {
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
-    public function show($id)
+    public function show($id): View
     {
         $contact = Contact::with('company')->find($id);
         return view('contacts.show', compact('contact'));
@@ -84,9 +79,9 @@ class ContactController extends Controller {
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
-    public function edit($id)
+    public function edit($id): View
     {
         $user_id = auth()->user()->id;
         $contact = Contact::find($id);
@@ -97,21 +92,13 @@ class ContactController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\ContactRequest  $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): RedirectResponse
     {
         $user_id = auth()->user()->id;
-        $contactvalidation = $request->validate([
-            'firstname' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
-            'lastname' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
-            'email' => 'required|email|max:255',
-            'address' => 'required',
-            'phone' => 'required',
-            'company_id' => 'required',
-        ]);
         $contact = Contact::find($id);
         $contact->update([...$request->all(), 'user_id' => $user_id]);
         return redirect('contacts');
@@ -121,9 +108,9 @@ class ContactController extends Controller {
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy($id)
+    public function destroy($id): RedirectResponse
     {
         $contact = Contact::find($id);
         $contact->delete();

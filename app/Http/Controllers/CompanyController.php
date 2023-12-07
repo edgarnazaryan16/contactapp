@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\CompanyRequest;
 use App\Models\Company;
 
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class CompanyController extends Controller {
     private $paginate = 5;
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
-    public function index()
+    public function index(): View
     {
         $user_id = auth()->user()->id;
         $companies = Company::where('user_id', $user_id)->orderBy('id', 'desc')->paginate($this->paginate);
@@ -23,9 +26,9 @@ class CompanyController extends Controller {
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
-    public function create()
+    public function create(): View
     {
         return view("companies.create");
     }
@@ -33,16 +36,12 @@ class CompanyController extends Controller {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  \App\Http\Requests\CompanyRequest $request
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(CompanyRequest $request): RedirectResponse
     {
         $user_id = auth()->user()->id;
-        $companyvalidation = $request->validate([
-            'name' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
-            'email' => 'required|email|max:255|unique:contacts,email',
-        ]);
         Company::create([...$request->all(), 'user_id' => $user_id]);
         return redirect('companies');
     }
@@ -51,9 +50,9 @@ class CompanyController extends Controller {
      * Display the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
-    public function show($id)
+    public function show($id): View
     {
         $company = Company::find($id);
         return view("companies.show", compact("company"));
@@ -63,9 +62,9 @@ class CompanyController extends Controller {
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
-    public function edit($id)
+    public function edit($id): View
     {
         $company = Company::find($id);
         return view("companies.edit", compact("company"));
@@ -74,17 +73,13 @@ class CompanyController extends Controller {
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Http\Requests\CompanyRequest $request
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, $id)
+    public function update(CompanyRequest $request, $id): RedirectResponse
     {
         $user_id = auth()->user()->id;
-        $companyvalidation = $request->validate([
-            'name' => 'required|regex:/^[a-zA-Z]+$/u|max:255',
-            'email' => 'required|email|max:255|unique:contacts,email',
-        ]);
         $company = Company::find($id);
         $company->update([...$request->all(), 'user_id' => $user_id]);
         return redirect('contacts');
@@ -94,9 +89,9 @@ class CompanyController extends Controller {
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy($id)
+    public function destroy($id): RedirectResponse
     {
         $company = Company::find($id);
         $company->delete();
